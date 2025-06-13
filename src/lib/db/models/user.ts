@@ -2,12 +2,10 @@ import mongoose, { Schema, Document } from "mongoose";
 
 export interface IUser extends Document {
   name: string;
-  conferenceId: string;
+  certificateNumber: string;
   email: string;
-  digiLockerId: string;
   date: Date;
-  certificateUri?: string;
-  certificateS3Url?: string;
+  certificateUrl?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -15,15 +13,16 @@ export interface IUser extends Document {
 const UserSchema: Schema = new Schema(
   {
     name: { type: String, required: true },
-    conferenceId: { type: String, required: true },
+    certificateNumber: { type: String, required: true, unique: true },
     email: { type: String, required: true },
-    digiLockerId: { type: String, required: true },
     date: { type: Date, required: true },
-    certificateUri: { type: String },
-    certificateS3Url: { type: String },
+    certificateUrl: { type: String },
   },
   { timestamps: true }
 );
+
+// Create index for faster certificate number searches
+UserSchema.index({ certificateNumber: 1 });
 
 // Use mongoose.models to check if the model is already defined
 export default mongoose.models.User ||

@@ -1,19 +1,19 @@
 import { Metadata } from "next";
-import CertificateSearch from "@/components/CertificateSearch";
+import CertificateManager from "@/components/CertificateManager";
 
 export const metadata: Metadata = {
-  title: "Certificate Search",
-  description: "Search for your certificates using certificate number",
+  title: "Certificate Management",
+  description: "Admin interface for managing certificates",
 };
 
-export default function Home() {
+export default function AdminPage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm">
         <h1 className="text-4xl font-bold text-center mb-8">
-          Certificate Search
+          Certificate Management
         </h1>
-        <CertificateSearch />
+        <CertificateManager />
       </div>
     </main>
   );
