@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 interface Certificate {
   _id: string;
@@ -10,6 +11,8 @@ interface Certificate {
   certificateType: string;
 }
 
+const PAGE_SIZE = 10;
+
 const CertificateTable: React.FC = () => {
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [loading, setLoading] = useState(true);
@@ -17,6 +20,7 @@ const CertificateTable: React.FC = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editData, setEditData] = useState<Partial<Certificate>>({});
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
 
   const fetchCertificates = async () => {
     setLoading(true);
@@ -88,123 +92,208 @@ const CertificateTable: React.FC = () => {
     );
   });
 
-  if (loading) return <div>Loading certificates...</div>;
+  // Pagination
+  const totalPages = Math.ceil(filteredCertificates.length / PAGE_SIZE);
+  const paginatedCertificates = filteredCertificates.slice(
+    (page - 1) * PAGE_SIZE,
+    page * PAGE_SIZE
+  );
+
+  useEffect(() => {
+    if (page > totalPages) setPage(1);
+  }, [totalPages]);
+
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-32">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <span className="ml-4 text-blue-600">Loading certificates...</span>
+      </div>
+    );
   if (error) return <div className="text-red-600">{error}</div>;
 
   return (
-    <div>
-      <div className="mb-2">
+    <div className="bg-white rounded shadow border border-blue-100 p-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2">
         <input
           type="text"
           placeholder="Search by name, registration ID, or college name..."
-          className="border px-2 py-1 rounded w-full max-w-md"
+          className="border px-3 py-2 rounded w-full md:w-80 focus:outline-none focus:ring-2 focus:ring-blue-200"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
+        <div className="flex gap-2 mt-2 md:mt-0">
+          <button
+            className="px-3 py-2 rounded bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
+            onClick={fetchCertificates}
+          >
+            Refresh
+          </button>
+        </div>
       </div>
-      <table className="min-w-full border mt-4">
-        <thead>
-          <tr>
-            <th className="border px-2 py-1">Name</th>
-            <th className="border px-2 py-1">College Name</th>
-            <th className="border px-2 py-1">Conference Name</th>
-            <th className="border px-2 py-1">Registration ID</th>
-            <th className="border px-2 py-1">Conference Date</th>
-            <th className="border px-2 py-1">Certificate Type</th>
-            <th className="border px-2 py-1">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredCertificates.map((cert) => (
-            <tr key={cert._id}>
-              {editingId === cert.registrationId ? (
-                <>
-                  <td className="border px-2 py-1">
-                    <input
-                      name="name"
-                      value={editData.name || ""}
-                      onChange={handleEditChange}
-                      className="border px-1 py-0.5 rounded w-full"
-                    />
-                  </td>
-                  <td className="border px-2 py-1">
-                    <input
-                      name="collegeName"
-                      value={editData.collegeName || ""}
-                      onChange={handleEditChange}
-                      className="border px-1 py-0.5 rounded w-full"
-                    />
-                  </td>
-                  <td className="border px-2 py-1">
-                    <input
-                      name="conferenceName"
-                      value={editData.conferenceName || ""}
-                      onChange={handleEditChange}
-                      className="border px-1 py-0.5 rounded w-full"
-                    />
-                  </td>
-                  <td className="border px-2 py-1">{cert.registrationId}</td>
-                  <td className="border px-2 py-1">
-                    <input
-                      name="conferenceDate"
-                      value={editData.conferenceDate || ""}
-                      onChange={handleEditChange}
-                      className="border px-1 py-0.5 rounded w-full"
-                    />
-                  </td>
-                  <td className="border px-2 py-1">
-                    <input
-                      name="certificateType"
-                      value={editData.certificateType || ""}
-                      onChange={handleEditChange}
-                      className="border px-1 py-0.5 rounded w-full"
-                    />
-                  </td>
-                  <td className="border px-2 py-1">
-                    <button
-                      className="bg-green-600 text-white px-2 py-1 rounded mr-2"
-                      onClick={handleEditSave}
-                    >
-                      Save
-                    </button>
-                    <button
-                      className="bg-gray-400 text-white px-2 py-1 rounded"
-                      onClick={() => setEditingId(null)}
-                    >
-                      Cancel
-                    </button>
-                  </td>
-                </>
-              ) : (
-                <>
-                  <td className="border px-2 py-1">{cert.name}</td>
-                  <td className="border px-2 py-1">{cert.collegeName}</td>
-                  <td className="border px-2 py-1">{cert.conferenceName}</td>
-                  <td className="border px-2 py-1">{cert.registrationId}</td>
-                  <td className="border px-2 py-1">
-                    {new Date(cert.conferenceDate).toLocaleDateString()}
-                  </td>
-                  <td className="border px-2 py-1">{cert.certificateType}</td>
-                  <td className="border px-2 py-1">
-                    <button
-                      className="bg-blue-600 text-white px-2 py-1 rounded mr-2"
-                      onClick={() => handleEdit(cert)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="bg-red-600 text-white px-2 py-1 rounded"
-                      onClick={() => handleDelete(cert.registrationId)}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </>
-              )}
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-sm">
+          <thead className="bg-blue-50 sticky top-0 z-10">
+            <tr>
+              <th className="px-4 py-3 text-left font-semibold text-gray-700">
+                Name
+              </th>
+              <th className="px-4 py-3 text-left font-semibold text-gray-700">
+                College Name
+              </th>
+              <th className="px-4 py-3 text-left font-semibold text-gray-700">
+                Conference Name
+              </th>
+              <th className="px-4 py-3 text-left font-semibold text-gray-700">
+                Registration ID
+              </th>
+              <th className="px-4 py-3 text-left font-semibold text-gray-700">
+                Conference Date
+              </th>
+              <th className="px-4 py-3 text-left font-semibold text-gray-700">
+                Certificate Type
+              </th>
+              <th className="px-4 py-3 text-center font-semibold text-gray-700">
+                Actions
+              </th>
             </tr>
+          </thead>
+          <tbody>
+            {paginatedCertificates.map((cert) => (
+              <tr
+                key={cert._id}
+                className="hover:bg-blue-50 transition border-b last:border-b-0"
+              >
+                {editingId === cert.registrationId ? (
+                  <>
+                    <td className="px-4 py-2">
+                      <input
+                        name="name"
+                        value={editData.name || ""}
+                        onChange={handleEditChange}
+                        className="border px-2 py-1 rounded w-full"
+                      />
+                    </td>
+                    <td className="px-4 py-2">
+                      <input
+                        name="collegeName"
+                        value={editData.collegeName || ""}
+                        onChange={handleEditChange}
+                        className="border px-2 py-1 rounded w-full"
+                      />
+                    </td>
+                    <td className="px-4 py-2">
+                      <input
+                        name="conferenceName"
+                        value={editData.conferenceName || ""}
+                        onChange={handleEditChange}
+                        className="border px-2 py-1 rounded w-full"
+                      />
+                    </td>
+                    <td className="px-4 py-2">{cert.registrationId}</td>
+                    <td className="px-4 py-2">
+                      <input
+                        name="conferenceDate"
+                        value={editData.conferenceDate || ""}
+                        onChange={handleEditChange}
+                        className="border px-2 py-1 rounded w-full"
+                      />
+                    </td>
+                    <td className="px-4 py-2">
+                      <input
+                        name="certificateType"
+                        value={editData.certificateType || ""}
+                        onChange={handleEditChange}
+                        className="border px-2 py-1 rounded w-full"
+                      />
+                    </td>
+                    <td className="px-4 py-2 text-center">
+                      <button
+                        className="bg-green-600 text-white px-3 py-1 rounded mr-2 hover:bg-green-700"
+                        onClick={handleEditSave}
+                      >
+                        Save
+                      </button>
+                      <button
+                        className="bg-gray-400 text-white px-3 py-1 rounded hover:bg-gray-500"
+                        onClick={() => setEditingId(null)}
+                      >
+                        Cancel
+                      </button>
+                    </td>
+                  </>
+                ) : (
+                  <>
+                    <td className="px-4 py-2">{cert.name}</td>
+                    <td className="px-4 py-2">{cert.collegeName}</td>
+                    <td className="px-4 py-2">{cert.conferenceName}</td>
+                    <td className="px-4 py-2">{cert.registrationId}</td>
+                    <td className="px-4 py-2">
+                      {new Date(cert.conferenceDate).toLocaleDateString()}
+                    </td>
+                    <td className="px-4 py-2">{cert.certificateType}</td>
+                    <td className="px-4 py-2 text-center flex gap-2 justify-center">
+                      <button
+                        className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+                        title="Edit"
+                        onClick={() => handleEdit(cert)}
+                      >
+                        <FaEdit size={16} />
+                      </button>
+                      <button
+                        className="bg-red-600 text-white p-2 rounded hover:bg-red-700"
+                        title="Delete"
+                        onClick={() => handleDelete(cert.registrationId)}
+                      >
+                        <FaTrash size={16} />
+                      </button>
+                    </td>
+                  </>
+                )}
+              </tr>
+            ))}
+            {paginatedCertificates.length === 0 && (
+              <tr>
+                <td colSpan={7} className="text-center py-8 text-gray-400">
+                  No certificates found.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-6 gap-2">
+          <button
+            className="px-3 py-1 rounded border bg-white hover:bg-blue-50 disabled:opacity-50"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1}
+          >
+            Previous
+          </button>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i}
+              className={`px-3 py-1 rounded border ${
+                page === i + 1
+                  ? "bg-blue-600 text-white border-blue-600"
+                  : "bg-white hover:bg-blue-50"
+              }`}
+              onClick={() => setPage(i + 1)}
+            >
+              {i + 1}
+            </button>
           ))}
-        </tbody>
-      </table>
+          <button
+            className="px-3 py-1 rounded border bg-white hover:bg-blue-50 disabled:opacity-50"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };
