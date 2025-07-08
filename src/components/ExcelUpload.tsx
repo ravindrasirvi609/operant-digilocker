@@ -265,218 +265,138 @@ const ExcelUpload: React.FC = () => {
   };
 
   return (
-    <div className="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-6 transition-colors">
-      {/* Header */}
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 flex items-center">
-          <FaFileExcel className="mr-2 text-green-600" />
-          Excel File Upload
-        </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          Upload your Excel file with certificate data. Supported formats:
-          .xlsx, .xls
-        </p>
-      </div>
-
-      {/* File Upload Area */}
+    <div className="max-w-2xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 mt-8">
+      <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white text-center">
+        Upload Certificates (Excel)
+      </h2>
       <div
-        className={`border-2 border-dashed rounded-lg p-8 text-center transition-all ${
+        className={`border-2 border-dashed rounded-lg p-6 mb-4 flex flex-col items-center justify-center cursor-pointer transition-colors ${
           isDragOver
-            ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-            : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
+            ? "border-blue-500 bg-blue-50 dark:bg-blue-900"
+            : "border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700"
         }`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
+        onClick={() => document.getElementById("excel-file-input")?.click()}
+        tabIndex={0}
+        role="button"
+        aria-label="Upload Excel File"
       >
-        <div className="space-y-4">
-          <div className="mx-auto w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
-            <FaUpload className="text-2xl text-gray-400 dark:text-gray-300" />
+        <FaFileExcel className="text-4xl text-green-600 mb-2" />
+        <span className="text-gray-800 dark:text-gray-100 font-medium">
+          Drag & drop or click to select an Excel file
+        </span>
+        <input
+          id="excel-file-input"
+          type="file"
+          accept=".xlsx,.xls"
+          className="hidden"
+          onChange={handleFileChange}
+        />
+        {fileName && (
+          <div className="mt-2 text-sm text-gray-700 dark:text-gray-300">
+            Selected: {fileName}
           </div>
-
-          <div>
-            <label className="cursor-pointer">
-              <span className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium">
-                Click to upload
-              </span>
-              <span className="text-gray-500 dark:text-gray-400">
-                {" "}
-                or drag and drop
-              </span>
-              <input
-                type="file"
-                accept=".xlsx,.xls"
-                className="hidden"
-                onChange={handleFileChange}
-              />
-            </label>
-          </div>
-
-          <div className="text-xs text-gray-500 dark:text-gray-400">
-            Required columns: Name, College Name, Conference Name, Registration
-            ID, Conference Date, Certificate Type
-          </div>
-        </div>
+        )}
       </div>
-
-      {/* File Info */}
-      {fileName && (
-        <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg flex items-center justify-between">
-          <div className="flex items-center">
-            <FaFileExcel className="text-green-600 mr-2" />
-            <span className="text-sm font-medium text-gray-900 dark:text-white">
-              {fileName}
-            </span>
-            <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
-              ({parsedData.length} records)
-            </span>
-          </div>
-          <button
-            onClick={handleReset}
-            className="text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
-          >
-            <FaTrash />
-          </button>
-        </div>
-      )}
-
-      {/* Data Table */}
-      {parsedData.length > 0 ? (
-        <div className="mt-6">
-          <div className="flex items-center justify-between mb-4">
-            <h4 className="text-md font-semibold text-gray-900 dark:text-white">
-              Preview Data ({parsedData.length} records)
-            </h4>
-          </div>
-
-          <div className="overflow-hidden border border-gray-200 dark:border-gray-700 rounded-lg">
-            <div className="overflow-x-auto max-h-96">
-              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead className="bg-gray-50 dark:bg-gray-700 sticky top-0">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                      Name
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                      College Name
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                      Conference Name
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                      Registration ID
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                      Conference Date
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                      Certificate Type
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                  {parsedData.map((row, i) => (
-                    <tr
-                      key={i}
-                      className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                    >
-                      <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
-                        {row.name || <span className="text-gray-400">-</span>}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
-                        {row.collegeName || (
-                          <span className="text-gray-400">-</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
-                        {row.conferenceName || (
-                          <span className="text-gray-400">-</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
-                        {row.registrationId || (
-                          <span className="text-gray-400">-</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
-                        {row.conferenceDate || (
-                          <span className="text-gray-400">-</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
-                        {row.certificateType || (
-                          <span className="text-gray-400">-</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 mt-6">
-            <button
-              className="flex items-center justify-center bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-6 py-3 rounded-lg font-medium transition-colors disabled:cursor-not-allowed"
-              onClick={handleUpload}
-              disabled={uploading}
-            >
-              {uploading ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
-                  Uploading...
-                </>
-              ) : (
-                <>
-                  <FaUpload className="mr-2" />
-                  Upload to Database
-                </>
-              )}
-            </button>
-
-            <button
-              className="flex items-center justify-center bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-6 py-3 rounded-lg font-medium transition-colors disabled:cursor-not-allowed"
-              onClick={handleReset}
-              disabled={uploading}
-            >
-              <FaRedo className="mr-2" />
-              Clear Data
-            </button>
-          </div>
-        </div>
-      ) : (
-        !fileName && (
-          <div className="text-center text-gray-500 dark:text-gray-400 py-8 mt-4">
-            <FaFileExcel className="mx-auto text-3xl mb-2 text-gray-300 dark:text-gray-600" />
-            <p>No file selected. Upload an Excel file to get started.</p>
-          </div>
-        )
-      )}
-
-      {/* Status Messages */}
       {uploadError && (
-        <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-          <div className="flex items-center text-red-700 dark:text-red-400">
-            <FaExclamationCircle className="mr-2 flex-shrink-0" />
-            <span className="text-sm">{uploadError}</span>
-          </div>
+        <div className="mb-4 p-3 rounded bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 flex items-center gap-2">
+          <FaExclamationCircle className="text-red-500 dark:text-red-300" />
+          <span>{uploadError}</span>
         </div>
       )}
-
       {uploadSuccess && (
-        <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-          <div className="flex items-center text-green-700 dark:text-green-400">
-            <FaCheckCircle className="mr-2 flex-shrink-0" />
-            <span className="text-sm">
-              Upload successful!
-              {lastUploadedCount !== null && (
-                <span className="ml-2 font-medium">
-                  {lastUploadedCount} records uploaded
-                </span>
-              )}
-            </span>
-          </div>
+        <div className="mb-4 p-3 rounded bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 flex items-center gap-2">
+          <FaCheckCircle className="text-green-500 dark:text-green-300" />
+          <span>Successfully uploaded {lastUploadedCount} certificates!</span>
+        </div>
+      )}
+      <div className="flex gap-2 mb-4">
+        <button
+          className="flex items-center gap-2 px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white font-semibold transition-colors disabled:opacity-60"
+          onClick={handleUpload}
+          disabled={uploading || parsedData.length === 0}
+        >
+          <FaUpload />
+          {uploading ? "Uploading..." : "Upload"}
+        </button>
+        <button
+          className="flex items-center gap-2 px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-900 dark:text-white font-semibold transition-colors"
+          onClick={handleReset}
+          disabled={uploading}
+        >
+          <FaRedo />
+          Reset
+        </button>
+      </div>
+      {parsedData.length > 0 && (
+        <div className="overflow-x-auto rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 mt-4">
+          <table className="min-w-full text-sm">
+            <thead className="bg-gray-200 dark:bg-gray-800">
+              <tr>
+                <th className="px-4 py-2 text-left font-semibold text-gray-900 dark:text-white">
+                  Name
+                </th>
+                <th className="px-4 py-2 text-left font-semibold text-gray-900 dark:text-white">
+                  College Name
+                </th>
+                <th className="px-4 py-2 text-left font-semibold text-gray-900 dark:text-white">
+                  Conference Name
+                </th>
+                <th className="px-4 py-2 text-left font-semibold text-gray-900 dark:text-white">
+                  Registration ID
+                </th>
+                <th className="px-4 py-2 text-left font-semibold text-gray-900 dark:text-white">
+                  Conference Date
+                </th>
+                <th className="px-4 py-2 text-left font-semibold text-gray-900 dark:text-white">
+                  Certificate Type
+                </th>
+                <th className="px-4 py-2 text-center font-semibold text-gray-900 dark:text-white">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+              {parsedData.map((row, idx) => (
+                <tr
+                  key={idx}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                >
+                  <td className="px-4 py-2 text-gray-900 dark:text-white">
+                    {row.name}
+                  </td>
+                  <td className="px-4 py-2 text-gray-900 dark:text-white">
+                    {row.collegeName}
+                  </td>
+                  <td className="px-4 py-2 text-gray-900 dark:text-white">
+                    {row.conferenceName}
+                  </td>
+                  <td className="px-4 py-2 text-gray-900 dark:text-white">
+                    {row.registrationId}
+                  </td>
+                  <td className="px-4 py-2 text-gray-900 dark:text-white">
+                    {row.conferenceDate}
+                  </td>
+                  <td className="px-4 py-2 text-gray-900 dark:text-white">
+                    {row.certificateType}
+                  </td>
+                  <td className="px-4 py-2 text-center">
+                    <button
+                      className="bg-red-500 hover:bg-red-600 dark:bg-red-700 dark:hover:bg-red-600 text-white px-2 py-1 rounded transition-colors"
+                      onClick={() => {
+                        setParsedData(parsedData.filter((_, i) => i !== idx));
+                      }}
+                      title="Remove"
+                    >
+                      <FaTrash />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

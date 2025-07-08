@@ -11,7 +11,9 @@ function getIdFromRequest(req: NextRequest) {
 export async function GET(req: NextRequest) {
   await dbConnect();
   const id = getIdFromRequest(req);
+  console.log("ID", id);
   const cert = await Certificate.findOne({ registrationId: id });
+  console.log("CERT", cert);
   if (!cert) return NextResponse.json({ error: "Not found" }, { status: 404 });
   return NextResponse.json(cert);
 }
