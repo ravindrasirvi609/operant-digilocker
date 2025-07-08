@@ -38,8 +38,7 @@ const AdminLoginForm: React.FC = () => {
       const data = await res.json();
 
       if (res.ok) {
-        // Use React state instead of localStorage for Claude.ai compatibility
-        // In a real environment, you would use localStorage.setItem("admin_token", data.token);
+        localStorage.setItem("admin_token", data.token); // Store token for dashboard auth
         router.push("/admin/dashboard");
       } else {
         setError(data.error || "Invalid credentials. Please try again.");
