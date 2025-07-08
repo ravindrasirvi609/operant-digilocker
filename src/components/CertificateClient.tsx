@@ -13,13 +13,15 @@ import {
   FileText,
 } from "lucide-react";
 
-interface Certificate {
+export interface Certificate {
   name: string;
   collegeName: string;
   conferenceName: string;
   registrationId: string;
   conferenceDate: string;
   certificateType: string;
+  createdAt?: string;
+  uploadDate?: string;
 }
 
 const issuer = "Operant Pharmacy Federation | Certificate Authority";

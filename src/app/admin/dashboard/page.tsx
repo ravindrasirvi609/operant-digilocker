@@ -14,6 +14,7 @@ import {
   FaSpinner,
   FaExclamationTriangle,
 } from "react-icons/fa";
+import { Certificate } from "@/components/CertificateClient";
 
 interface DashboardStats {
   totalCertificates: number;
@@ -55,7 +56,7 @@ export default function AdminDashboardPage() {
 
         // Calculate stats (you can enhance this with actual API endpoints)
         const totalCertificates = certificatesData.length;
-        const recentUploads = certificatesData.filter((cert: any) => {
+        const recentUploads = certificatesData.filter((cert: Certificate) => {
           const uploadDate = new Date(
             cert.createdAt || cert.uploadDate || Date.now()
           );
